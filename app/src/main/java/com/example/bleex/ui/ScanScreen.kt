@@ -20,57 +20,84 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.bleex.bluetooth.BleDevice
+import com.example.bleex.bluetooth.BleScanner
 
-@Preview(showBackground = true)
 @Composable
-fun ScanScreen() {
-    //fakes for now
-    val devices = listOf(
-        BleDevice("Pixel Buds", "-42", "AA:BB:CC:01"),
-        BleDevice("Samsung TV", "-67", "AA:BB:CC:02"),
-        BleDevice("Garmin Watch", "-55", "AA:BB:CC:03")
-    )
+fun ScanScreen(devices: List<BleDevice>) {
 
-    var expandedDevice by remember {mutableStateOf<String?>(null)}
-    Column (
+    var expandedDevice by remember { mutableStateOf<String?>(null) }
+
+    Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        LazyColumn {
-            items(devices) { device ->
-                val isExpanded = expandedDevice == device.address
+    ) {
+        if (devices.isEmpty()) {
+            Text("No devices found")
+        } else {
+            LazyColumn {
+                items(devices) { device ->
+                    val isExpanded = expandedDevice == device.address
 
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            expandedDevice =
-                                if (isExpanded) null else device.address
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                expandedDevice =
+                                    if (isExpanded) null else device.address
+                            }
+                            .padding(16.dp)
+                    ) {
+
+                        Text(text = device.name)
+
+                        if (isExpanded) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Address: ${device.address}")
+                            Text("Signal strength: ${device.rssi}")
+                            Text("Service: Battery, Device Info")
                         }
-                        .padding(16.dp)
-                ) {
-
-                    Text(text = device.name)
-
-                    if (isExpanded) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Address: ${device.address}")
-                        Text("Signal strength: ${device.rssi}")
-                        Text("Service: Battery, Device Info")
-
                     }
-
                 }
             }
         }
     }
 }
-data class BleDevice(
-    val name: String,
-    val address: String,
-    val rssi: String,
-    //val estimatedDistance: Double?,
-)
+
+
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun ScanScreenPreview() {
+    val fakeDevices = listOf(
+        BleDevice(
+            name = "Pixel Buds",
+            address = "AA:BB:CC:01",
+            rssi = -42,
+            //estimatedDistance = null,
+            services = listOf("Battery Service")
+        ),
+        BleDevice(
+            name = "Samsung TV",
+            address = "AA:BB:CC:02",
+            rssi = -67,
+            //estimatedDistance = null,
+            services = listOf("Device Information")
+        ),
+        BleDevice(
+            name = "Garmin Watch",
+            address = "AA:BB:CC:03",
+            rssi = -55,
+            //estimatedDistance = null,
+            services = listOf("Battery Service", "Heart Rate")
+        )
+    )
+
+    ScanScreen(devices = fakeDevices)
+}
+

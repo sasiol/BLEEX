@@ -8,8 +8,16 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
 
+/**
+ * Handles BLE device scanning.
+ * Receives scan results from Android's Bluetooth APIs
+ * Creates BleDevice objects and passes them to the app when devices are found.
+ */
+class BleScanner(
+    private val context: Context,
+    private val onDeviceFound: (BleDevice) -> Unit
 
-class BleScanner(private val context: Context) {
+        ) {
     private val bluetoothManager =context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val bluetoothAdapter = bluetoothManager.adapter
     private val bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
@@ -23,6 +31,16 @@ class BleScanner(private val context: Context) {
             result: ScanResult
         ) {
             val name = result.device.name ?: "Unknown device" //incase the device name is null
+
+            val device = BleDevice(
+                name = name,
+                address = result.device.address,
+                rssi = result.rssi,
+                //estimatedDistance = null,
+                services = emptyList()
+            )
+
+            onDeviceFound(device)
             Log.d(
                 "BLE",
                 "Name: $name, Address: ${result.device.address}, RSSI: ${result.rssi}"
