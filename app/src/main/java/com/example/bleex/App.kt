@@ -54,7 +54,8 @@ fun App() {
 
     if (showScanScreen) {
         ScanScreen(
-            devices = devices
+            devices = devices,
+            onStopScan = {scanner.stopScan()}
         )
     } else {
         StartScreen(
