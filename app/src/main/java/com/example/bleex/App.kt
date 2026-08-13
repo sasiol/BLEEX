@@ -14,34 +14,24 @@ import com.example.bleex.bluetooth.BleDevice
 import com.example.bleex.bluetooth.BleScanner
 import com.example.bleex.bluetooth.hasBlePermissions
 import com.example.bleex.ui.ScanScreen
+import com.example.bleex.ui.ScanViewModel
 import com.example.bleex.ui.StartScreen
 
 
 @Composable
 fun App() {
+    val scanViewModel: ScanViewModel= viewModel()
+
     var showScanScreen by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
-    val devices = remember {
-        mutableStateListOf<BleDevice>()
-    }
 
     val scanner = remember {
-        BleScanner(context) { device ->
-            val index = devices.indexOfFirst {
-                it.address == device.address
-            }
-            if (index == -1) {
-                //new device
-                devices.add(device)
-            } else {
-                //update existing device
-                devices[index] = device
-            }
+        BleScanner(context) {device ->
+            scanViewModel.onDeviceFound(device)
         }
     }
-
-
+        // permission checks
         val permissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -52,11 +42,14 @@ fun App() {
             }
         }
 
+    //switch to scanning screen
     if (showScanScreen) {
         ScanScreen(
-            devices = devices,
+            devices = scanViewModel.devices,
             onStopScan = {scanner.stopScan()}
         )
+
+        //starting screen
     } else {
         StartScreen(
             onStartClick = @androidx.annotation.RequiresPermission(android.Manifest.permission.BLUETOOTH_SCAN) {
@@ -76,5 +69,7 @@ fun App() {
         )
     }
 }
+
+fun viewModel(): ScanViewModel {}
 
 
