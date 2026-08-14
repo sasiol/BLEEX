@@ -1,10 +1,12 @@
 package com.example.bleex
 
 import android.Manifest
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +23,7 @@ import com.example.bleex.ui.StartScreen
 @Composable
 fun App() {
     val scanViewModel: ScanViewModel= viewModel()
+    val devices by scanViewModel.devices.collectAsState() //collect the current device list from viewModel
 
     var showScanScreen by remember { mutableStateOf(false) }
 
@@ -45,7 +48,7 @@ fun App() {
     //switch to scanning screen
     if (showScanScreen) {
         ScanScreen(
-            devices = scanViewModel.devices,
+            devices = devices,
             onStopScan = {scanner.stopScan()}
         )
 
@@ -70,6 +73,5 @@ fun App() {
     }
 }
 
-fun viewModel(): ScanViewModel {}
 
 
