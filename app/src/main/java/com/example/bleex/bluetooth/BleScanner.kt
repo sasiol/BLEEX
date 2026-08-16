@@ -7,6 +7,15 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.launch
 
 /**
  * Handles BLE device scanning.
@@ -14,72 +23,61 @@ import androidx.annotation.RequiresPermission
  * Creates BleDevice objects and passes them to the app when devices are found.
  */
 class BleScanner(
-    private val context: Context,
-    private val onDeviceFound: (BleDevice) -> Unit
-
+    private val context: Context
         ) {
+
     private val bluetoothManager =context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     private val bluetoothAdapter = bluetoothManager.adapter
     private val bluetoothLeScanner = bluetoothAdapter.bluetoothLeScanner
-    private var scanning = false
 
-    private val scanCallback = object : ScanCallback() {
-
-        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-        override fun onScanResult(
-            callbackType: Int,
-            result: ScanResult
-        ) {
-            val name = result.device.name ?: "Unknown device" //incase the device name is null
-
-            val device = BleDevice(
-                name = name,
-                address = result.device.address,
-                rssi = result.rssi,
-                //estimatedDistance = null,
-                services = emptyList()
-            )
-
-            onDeviceFound(device)
-            Log.d(
-                "BLE",
-                "Name: $name, Address: ${result.device.address}, RSSI: ${result.rssi}"
-            )
-        }
-    }
-
-    // Functions
-    fun startScan() {
-        if (scanning) return
-        Log.d("BLE", "startScan() called")
-
+    @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
+    //create a flow that devices are put into when found
+    fun scan(): Flow<BleDevice> =callbackFlow {
+        //check permission
         if (!context.hasBlePermissions()) {
-            Log.d("BLE", "Missing permissions")
-            return
+            close()
+            return@callbackFlow
         }
 
-        if (scanning) {
-            Log.d("BLE", "Already scanning")
-            return
-        }
+         val scanCallback = object : ScanCallback() {
 
+
+            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+            override fun onScanResult(
+                callbackType: Int,
+                result: ScanResult
+            ) {
+                val name = result.device.name ?: "Unknown device" //incase the device name is null
+
+                val device = BleDevice(
+                    name = name,
+                    address = result.device.address,
+                    rssi = result.rssi,
+                    //estimatedDistance = null,
+                    services = emptyList()
+                )
+                //send device to flow
+                trySend(device)
+                Log.d(
+                    "BLE",
+                    "Name: $name, Address: ${result.device.address}, RSSI: ${result.rssi}"
+                )
+            }
+        }
         try {
             bluetoothLeScanner.startScan(scanCallback)
-            scanning = true
         } catch (e: SecurityException) {
-            Log.e("BLE", "Missing Bluetooth permission", e)
+            close(e)
+            return@callbackFlow
+        }
+
+        awaitClose {
+            try {
+                bluetoothLeScanner.stopScan(scanCallback)
+            } catch (e: SecurityException) {
+                Log.e("BLE", "Could not stop BLE scan", e)
+            }
         }
     }
-
-    fun stopScan() {
-        if (!scanning) return
-        try {
-            bluetoothLeScanner.stopScan(scanCallback)
-            scanning = false
-        }catch   (e: SecurityException) {
-            Log.e("BLE", "Missing Bluetooth permission", e)
-            }
-    }
 }
-
 

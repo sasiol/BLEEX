@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,25 +23,28 @@ import com.example.bleex.ui.StartScreen
 
 @Composable
 fun App() {
-    val scanViewModel: ScanViewModel= viewModel()
-    val devices by scanViewModel.devices.collectAsState() //collect the current device list from viewModel
 
-    var showScanScreen by remember { mutableStateOf(false) }
+    var showScanScreen by remember { mutableStateOf(false) } //better way to do?
 
     val context = LocalContext.current
 
+    //create a scanner for scanning bluetooth devices
     val scanner = remember {
-        BleScanner(context) {device ->
-            scanViewModel.onDeviceFound(device)
-        }
+        BleScanner(context)
     }
+    //create scanViewModel and pass it the scanner
+    val scanViewModel: ScanViewModel = viewModel(
+        factory = ScanViewModel.factory(scanner)
+    )
+    //collect devices from scanViewModel
+    val devices by scanViewModel.devices.collectAsState()
         // permission checks
         val permissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
-        ) @androidx.annotation.RequiresPermission(android.Manifest.permission.BLUETOOTH_SCAN) { permissions ->
+        )  { permissions ->
             if (context.hasBlePermissions()) {
-                scanner.startScan()
+                scanViewModel.startScanning()
                 showScanScreen = true
             }
         }
@@ -49,15 +53,16 @@ fun App() {
     if (showScanScreen) {
         ScanScreen(
             devices = devices,
-            onStopScan = {scanner.stopScan()}
+            onStopScan = {scanViewModel.stopScanning()
+                showScanScreen = false}
         )
 
         //starting screen
     } else {
         StartScreen(
-            onStartClick = @androidx.annotation.RequiresPermission(android.Manifest.permission.BLUETOOTH_SCAN) {
+            onStartClick = {
                 if (context.hasBlePermissions()) {
-                    scanner.startScan()
+                    scanViewModel.startScanning()
                     showScanScreen = true
                 } else {
                     permissionLauncher.launch(
