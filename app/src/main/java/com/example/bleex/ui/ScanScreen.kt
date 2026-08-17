@@ -50,7 +50,7 @@ import androidx.compose.material3.Button
 
 
 @Composable
-fun ScanScreen(devices: List<BleDevice>, onStopScan:() -> Unit ) {
+fun ScanScreen(devices: List<BleDevice>, isScanning: Boolean, onStopScan:() -> Unit ) {
 
     var expandedDevice by remember { mutableStateOf<String?>(null) }
 
@@ -75,9 +75,12 @@ fun ScanScreen(devices: List<BleDevice>, onStopScan:() -> Unit ) {
                 fontSize = 32.sp
             )
 
-            Text(
-                text = "Scanning"
-            )
+            if (isScanning) {
+
+                Text(
+                    text = "Scanning"
+                )
+            }
         }
 
         // Device list
@@ -152,7 +155,9 @@ fun ScanScreen(devices: List<BleDevice>, onStopScan:() -> Unit ) {
             }
         }
             }
-        ScanBorder()
+        if (isScanning){
+            ScanBorder()
+        }
         Button(
             onClick = onStopScan,
             modifier = Modifier
@@ -253,6 +258,6 @@ fun ScanScreenPreview() {
         )
     )
 
-    ScanScreen(devices = fakeDevices, onStopScan= {})
+    ScanScreen(devices = fakeDevices, isScanning = true, onStopScan= {})
 }
 

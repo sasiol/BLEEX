@@ -26,6 +26,10 @@ class ScanViewModel (
 
     val devices: StateFlow<List<BleDevice>> = _devices.asStateFlow()
 
+    //for tracking scanning state
+    private val _isScanning = MutableStateFlow(false)
+    val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
+
     //for collecting flow from scanner
     private var collectJob: Job? =null
 
@@ -33,6 +37,8 @@ class ScanViewModel (
 
         //if already running, dont start another scan
         if (collectJob != null) return
+
+        _isScanning.value = true
 
         collectJob = viewModelScope.launch{
             scanner.scan().collect { device ->
@@ -44,6 +50,7 @@ class ScanViewModel (
     fun stopScanning() {
         collectJob?.cancel()
         collectJob = null
+        _isScanning.value = false
     }
 
     //update devices

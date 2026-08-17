@@ -38,6 +38,10 @@ fun App() {
     )
     //collect devices from scanViewModel
     val devices by scanViewModel.devices.collectAsState()
+    //track scanning state
+    val isScanning by scanViewModel.isScanning.collectAsState()
+
+
         // permission checks
         val permissionLauncher =
         rememberLauncherForActivityResult(
@@ -53,7 +57,9 @@ fun App() {
     if (showScanScreen) {
         ScanScreen(
             devices = devices,
-            onStopScan = {scanViewModel.stopScanning()
+            isScanning = isScanning,
+            onStopScan = {
+                scanViewModel.stopScanning()
                 showScanScreen = false}
         )
 
