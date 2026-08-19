@@ -4,17 +4,14 @@ import android.Manifest
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
-import com.example.bleex.bluetooth.BleDevice
-import com.example.bleex.bluetooth.BleScanner
+import com.example.bleex.bluetooth.AndroidBleScanner
 import com.example.bleex.bluetooth.hasBlePermissions
 import com.example.bleex.ui.ScanScreen
 import com.example.bleex.ui.ScanViewModel
@@ -30,7 +27,7 @@ fun App() {
 
     //create a scanner for scanning bluetooth devices
     val scanner = remember {
-        BleScanner(context)
+        AndroidBleScanner(context)
     }
     //create scanViewModel and pass it the scanner
     val scanViewModel: ScanViewModel = viewModel(

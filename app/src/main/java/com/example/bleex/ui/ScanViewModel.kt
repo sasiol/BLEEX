@@ -1,8 +1,5 @@
 package com.example.bleex.ui
 
-import androidx.annotation.RequiresPermission
-import android.Manifest
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -10,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import kotlinx.coroutines.launch
 import com.example.bleex.bluetooth.BleDevice
+import com.example.bleex.bluetooth.AndroidBleScanner
 import com.example.bleex.bluetooth.BleScanner
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
