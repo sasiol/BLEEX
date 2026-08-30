@@ -9,6 +9,8 @@ import kotlinx.coroutines.launch
 import com.example.bleex.bluetooth.BleDevice
 import com.example.bleex.bluetooth.AndroidBleScanner
 import com.example.bleex.bluetooth.BleScanner
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +18,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 
 class ScanViewModel (
-    private val scanner: BleScanner
+    private val scanner: BleScanner,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ): ViewModel(){
 
     //has private and public  list of devices using flow
@@ -38,7 +41,7 @@ class ScanViewModel (
 
         _isScanning.value = true
 
-        collectJob = viewModelScope.launch{
+        collectJob = viewModelScope.launch(dispatcher){
             scanner.scan().collect { device ->
                 onDeviceFound(device)
             }
