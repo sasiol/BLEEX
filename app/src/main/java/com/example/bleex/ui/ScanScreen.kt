@@ -40,12 +40,17 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.material3.Button
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 
 @Composable
-fun ScanScreen(devices: List<BleDevice>, isScanning: Boolean, onStopScan:() -> Unit ) {
+fun ScanScreen(devices: List<BleDevice>,
+               isScanning: Boolean,
+               error:String?,
+               onStopScan:() -> Unit ) {
 
     var expandedDevice by remember { mutableStateOf<String?>(null) }
+
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -53,6 +58,11 @@ fun ScanScreen(devices: List<BleDevice>, isScanning: Boolean, onStopScan:() -> U
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
+            if (error != null) {
+                Text(text = error,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
 
         // Top bar
         Row(
@@ -251,6 +261,6 @@ fun ScanScreenPreview() {
         )
     )
 
-    ScanScreen(devices = fakeDevices, isScanning = true, onStopScan= {})
+    ScanScreen(devices = fakeDevices, isScanning = true, error=null, onStopScan= {})
 }
 

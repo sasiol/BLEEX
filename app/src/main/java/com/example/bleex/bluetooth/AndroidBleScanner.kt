@@ -27,9 +27,11 @@ class AndroidBleScanner(
     @RequiresPermission(Manifest.permission.BLUETOOTH_SCAN)
     //create a flow that devices are put into when found
     override fun scan(): Flow<BleDevice> =callbackFlow {
+
+
         //check permission
         if (!context.hasBlePermissions()) {
-            close()
+            close(SecurityException())
             return@callbackFlow
         }
 

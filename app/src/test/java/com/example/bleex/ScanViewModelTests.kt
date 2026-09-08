@@ -112,6 +112,8 @@ class ScanViewModelTests {
 
     }
 
+
+
 }
 
 private class TestBleScanner : BleScanner {

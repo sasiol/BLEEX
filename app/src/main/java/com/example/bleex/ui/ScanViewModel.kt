@@ -31,6 +31,10 @@ class ScanViewModel (
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
 
+    //error handling
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error.asStateFlow()
+
     //for collecting flow from scanner
     private var collectJob: Job? =null
 
@@ -38,13 +42,27 @@ class ScanViewModel (
 
         //if already running, dont start another scan
         if (collectJob != null) return
-
+        _error.value = null
         _isScanning.value = true
 
         collectJob = viewModelScope.launch(dispatcher){
-            scanner.scan().collect { device ->
-                onDeviceFound(device)
+            try {
+                scanner.scan().collect { device ->
+                    onDeviceFound(device)
+                }
+            } catch (e: SecurityException) {
+                _error.value = "Bluetooth permission is required to scan for devices."
+                _isScanning.value = false
+                collectJob = null
+
             }
+            catch (e: Exception) {
+                _error.value = "Scanning Failed"
+                _isScanning.value=false
+                collectJob = null
+                }
+
+
         }
     }
 
