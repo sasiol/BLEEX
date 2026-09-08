@@ -37,6 +37,7 @@ fun App() {
     val devices by scanViewModel.devices.collectAsState()
     //track scanning state
     val isScanning by scanViewModel.isScanning.collectAsState()
+    val error by scanViewModel.error.collectAsState()
 
 
         // permission checks
@@ -55,10 +56,11 @@ fun App() {
         ScanScreen(
             devices = devices,
             isScanning = isScanning,
-            error= null,
-            onStopScan = {
-                scanViewModel.stopScanning()
-                showScanScreen = false}
+            error= error,
+            onStartScan = {
+                scanViewModel.startScanning()
+            },
+            onStopScan = { scanViewModel.stopScanning() }
         )
 
         //starting screen

@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 fun ScanScreen(devices: List<BleDevice>,
                isScanning: Boolean,
                error:String?,
+               onStartScan: () -> Unit,
                onStopScan:() -> Unit ) {
 
     var expandedDevice by remember { mutableStateOf<String?>(null) }
@@ -146,8 +147,14 @@ fun ScanScreen(devices: List<BleDevice>,
             ScanBorder()
         }
         BleexButton(
-            text = "STOP SCAN",
-            onClick = onStopScan,
+            text = if (isScanning) "STOP SCAN" else "START SCAN",
+            onClick = {
+                if (isScanning) {
+                    onStopScan()
+                } else {
+                    onStartScan()
+                }
+            },
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 24.dp)
@@ -290,7 +297,7 @@ fun ScanScreenPreview() {
             services = listOf("Battery Service", "Heart Rate")
         )
     )
-
-    ScanScreen(devices = fakeDevices, isScanning = true, error=null, onStopScan= {})
+    var isScanning by remember { mutableStateOf(true) }
+    ScanScreen(devices = fakeDevices, isScanning = isScanning, error=null, onStartScan = {isScanning = true}, onStopScan= {isScanning = false})
 }
 
