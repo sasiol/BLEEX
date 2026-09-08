@@ -55,6 +55,7 @@ fun App() {
         ScanScreen(
             devices = devices,
             isScanning = isScanning,
+            error= null,
             onStopScan = {
                 scanViewModel.stopScanning()
                 showScanScreen = false}

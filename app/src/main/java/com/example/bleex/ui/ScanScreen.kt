@@ -33,6 +33,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.material3.Button
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 
@@ -65,26 +67,7 @@ fun ScanScreen(devices: List<BleDevice>,
             }
 
         // Top bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(100.dp)
-                .padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "BLEEX",
-                fontSize = 32.sp
-            )
-
-            if (isScanning) {
-
-                Text(
-                    text = "Scanning"
-                )
-            }
-        }
+        BleexTopBar ()
 
         // Device list
         LazyColumn(
@@ -100,6 +83,11 @@ fun ScanScreen(devices: List<BleDevice>,
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .heightIn(min = 72.dp)
+                        .padding(
+                            horizontal = 24.dp,
+                            vertical = 6.dp
+                        )
                         .clickable {
                             expandedDevice =
                                 if (isExpanded) {
@@ -108,10 +96,6 @@ fun ScanScreen(devices: List<BleDevice>,
                                     device.address
                                 }
                         }
-                        .padding(
-                            horizontal = 24.dp,
-                            vertical = 6.dp
-                        )
                 ) {
 
                     Row(
@@ -161,14 +145,13 @@ fun ScanScreen(devices: List<BleDevice>,
         if (isScanning){
             ScanBorder()
         }
-        Button(
+        BleexButton(
+            text = "STOP SCAN",
             onClick = onStopScan,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 24.dp)
-        ) {
-            Text("Stop scanning")
-        }
+        )
     }
 }
 
@@ -214,23 +197,70 @@ fun ScanBorder() {
         val pathMeasure = PathMeasure()
         pathMeasure.setPath(path, false)
         val pathLength = pathMeasure.length
+        val lightLength = 800.dp.toPx()
         val start = progress * pathLength
+        val end = start + lightLength
         val segment = Path()
 
+        if (end <= pathLength) {
+            // Normal case
+            val segment = Path()
         pathMeasure.getSegment(
             startDistance = start,
-            stopDistance = start + 500.dp.toPx(),
+            stopDistance = end,
             destination = segment,
             startWithMoveTo = true
         )
         drawPath(
             path = segment,
-            color = Color.Blue,
-            style = Stroke(width = 5.dp.toPx())
+            Color(0xFF0D2A4A),
+            style = Stroke(width = 12.dp.toPx(),
+                cap = StrokeCap.Round)
         )
+
+
+        } else {
+            // The light reaches the end of the border,
+            // so continue from the beginning.
+
+            val firstSegment = Path()
+
+            pathMeasure.getSegment(
+                startDistance = start,
+                stopDistance = pathLength,
+                destination = firstSegment,
+                startWithMoveTo = true
+            )
+
+            drawPath(
+                path = firstSegment,
+                color = Color(0xFF0D2A4A),
+                style = Stroke(
+                    width = 12.dp.toPx(),
+                    cap = StrokeCap.Round
+                )
+            )
+
+            val secondSegment = Path()
+
+            pathMeasure.getSegment(
+                startDistance = 0f,
+                stopDistance = end - pathLength,
+                destination = secondSegment,
+                startWithMoveTo = true
+            )
+
+            drawPath(
+                path = secondSegment,
+                color = Color(0xFF0D2A4A),
+                style = Stroke(
+                    width = 12.dp.toPx(),
+                    cap = StrokeCap.Round
+                )
+            )
+        }
     }
 }
-
 
 
 
