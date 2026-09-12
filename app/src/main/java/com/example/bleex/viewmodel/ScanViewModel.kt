@@ -1,13 +1,11 @@
-package com.example.bleex.ui
+package com.example.bleex.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
-import kotlinx.coroutines.launch
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bleex.bluetooth.BleDevice
-import com.example.bleex.bluetooth.AndroidBleScanner
 import com.example.bleex.bluetooth.BleScanner
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +13,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-
+import kotlinx.coroutines.launch
 
 class ScanViewModel (
     private val scanner: BleScanner,
@@ -100,5 +98,3 @@ class ScanViewModel (
             }
     }
 }
-
-

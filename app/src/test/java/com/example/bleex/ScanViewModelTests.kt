@@ -1,18 +1,15 @@
 package com.example.bleex
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.bleex.bluetooth.BleDevice
 import com.example.bleex.bluetooth.BleScanner
-import com.example.bleex.ui.ScanViewModel
+import com.example.bleex.viewmodel.ScanViewModel
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import org.junit.Test
 import kotlinx.coroutines.test.runTest
-import org.junit.experimental.theories.suppliers.TestedOn
 
 class ScanViewModelTests {
 

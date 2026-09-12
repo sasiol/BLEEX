@@ -1,4 +1,4 @@
-package com.example.bleex.ui
+package com.example.bleex.ui.components
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape

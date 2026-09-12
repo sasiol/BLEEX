@@ -14,7 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.bleex.bluetooth.AndroidBleScanner
 import com.example.bleex.bluetooth.hasBlePermissions
 import com.example.bleex.ui.ScanScreen
-import com.example.bleex.ui.ScanViewModel
+import com.example.bleex.viewmodel.ScanViewModel
 import com.example.bleex.ui.StartScreen
 
 
