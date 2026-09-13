@@ -75,5 +75,8 @@ class AndroidBleScanner(
             }
         }
     }
+    override fun isBluetoothEnabled(): Boolean {
+        return bluetoothAdapter.isEnabled
+    }
 }
 

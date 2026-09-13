@@ -10,7 +10,7 @@ import com.example.bleex.ui.components.BleexButton
 import com.example.bleex.ui.components.BleexTopBar
 
 
-@Preview(showBackground = true)
+
 @Composable
 fun StartScreen(
     onStartClick: () -> Unit

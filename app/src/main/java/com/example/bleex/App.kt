@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import com.example.bleex.bluetooth.AndroidBleScanner
 import com.example.bleex.bluetooth.hasBlePermissions
 import com.example.bleex.ui.ScanScreen

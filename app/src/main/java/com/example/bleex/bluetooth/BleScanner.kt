@@ -4,4 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface BleScanner {
      fun scan(): Flow<BleDevice>
+     fun isBluetoothEnabled(): Boolean
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bleex.bluetooth.BleDevice
 import com.example.bleex.bluetooth.BleScanner
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -40,15 +41,25 @@ class ScanViewModel (
 
         //if already running, dont start another scan
         if (collectJob != null) return
+
+        //check if bluetooth is turned on
+        if (!scanner.isBluetoothEnabled()){
+            _error.value= "Bluetooth is turned off"
+            return
+        }
         _error.value = null
         _isScanning.value = true
 
+        // Start a coroutine that collects devices from the scanner's Flo
         collectJob = viewModelScope.launch(dispatcher){
             try {
                 scanner.scan().collect { device ->
                     onDeviceFound(device)
                 }
-            } catch (e: SecurityException) {
+            }catch (e: CancellationException){
+                throw e
+            }
+            catch (e: SecurityException) {
                 _error.value = "Bluetooth permission is required to scan for devices."
                 _isScanning.value = false
                 collectJob = null
@@ -70,7 +81,7 @@ class ScanViewModel (
         _isScanning.value = false
     }
 
-    //update devices
+    //copy devices from scanner´s flow into viewModel´s stateFlow that is being observer by App()
     //when device is found, check if it is new device or not
     fun onDeviceFound(device: BleDevice) {
         val index = _devices.value.indexOfFirst {

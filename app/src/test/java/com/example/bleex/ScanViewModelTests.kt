@@ -115,6 +115,9 @@ class ScanViewModelTests {
 
 private class TestBleScanner : BleScanner {
     val devices = MutableSharedFlow<BleDevice>()
-
+    var bluetoothEnabled = true
     override fun scan(): Flow<BleDevice> = devices
+    override fun isBluetoothEnabled(): Boolean {
+        return bluetoothEnabled
+    }
 }
