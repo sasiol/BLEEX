@@ -4,6 +4,7 @@ import com.example.bleex.bluetooth.BleDevice
 import com.example.bleex.bluetooth.BleScanner
 import com.example.bleex.viewmodel.ScanViewModel
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -73,6 +74,43 @@ class ScanViewModelTests {
 
     }
 
+    @Test
+    fun `startScanning does not scan when Bluetooth is disabled`() =runTest {
+        val scanner = TestBleScanner()
+        scanner.bluetoothEnabled=false
+
+        val viewModel = ScanViewModel(
+            scanner = scanner,
+            dispatcher = StandardTestDispatcher(testScheduler)
+        )
+
+        viewModel.startScanning()
+        advanceUntilIdle()
+        scanner.devices.emit(testDevice1)
+
+        assertEquals("Bluetooth is turned off", viewModel.error.value)
+        assertEquals(false, viewModel.isScanning.value)
+        assertTrue(viewModel.devices.value.isEmpty())
+    }
+
+    @Test
+    fun `startScanning does not start another scan when already scanning`() = runTest {
+        val scanner = TestBleScanner()
+
+        val viewModel = ScanViewModel(
+            scanner = scanner,
+            dispatcher = StandardTestDispatcher(testScheduler)
+        )
+
+        viewModel.startScanning()
+        advanceUntilIdle()
+
+        viewModel.startScanning()
+        advanceUntilIdle()
+
+        assertEquals(1, scanner.scanCount)
+    }
+
 
 
 }
@@ -80,7 +118,11 @@ class ScanViewModelTests {
 private class TestBleScanner : BleScanner {
     val devices = MutableSharedFlow<BleDevice>()
     var bluetoothEnabled = true
-    override fun scan(): Flow<BleDevice> = devices
+    var scanCount=0
+    override fun scan(): Flow<BleDevice> {
+        scanCount++
+        return devices
+    }
     override fun isBluetoothEnabled(): Boolean {
         return bluetoothEnabled
     }
