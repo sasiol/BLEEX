@@ -72,6 +72,15 @@ fun BleDeviceCard(
                     text = "Services: ${device.services.joinToString()}",
                     fontSize = 25.sp
                 )
+
+                Text(
+                    text = "Manufacturer: ${device.manufacturerData}",
+                    fontSize = 25.sp
+                )
+                Text(
+                    text = "Connectable: ${if (device.isConnectable) "Yes" else "No"}",
+                    fontSize = 25.sp
+                )
             }
         }
     }
