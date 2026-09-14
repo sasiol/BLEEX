@@ -23,3 +23,23 @@ jobs:
 
         - name: Run unit tests
           run: ./gradlew test
+
+        - name: Publish test results
+          if: always()
+          uses: dorny/test-reporter@v2
+          with:
+              name: Unit Tests
+              path: app/build/test-results/testDebugUnitTest/*.xml
+              reporter: java-junit
+
+        - name: SECURITY:Run Android lint
+          run: ./gradlew lint
+
+        - name: SECURITY:Run Trivy scan
+          uses: aquasecurity/trivy-action@v0.36.0
+          with:
+              scan-type: 'fs'
+              scan-ref: '.'
+              severity: 'HIGH,CRITICAL'
+              exit-code: '1'
+              ignore-unfixed: true
