@@ -17,39 +17,21 @@ class ScanViewModelTests {
     fun `onDeviceFound adds new device`() {
         val viewModel = ScanViewModel(TestBleScanner())
 
-        val device = BleDevice(
-            name = "Test Device",
-            address = "AA:BB:CC:DD:EE:FF",
-            rssi = -50,
-            services = emptyList()
-        )
-        viewModel.onDeviceFound(device)
+        viewModel.onDeviceFound(testDevice1)
 
-        assertEquals(listOf(device), viewModel.devices.value)
+        assertEquals(listOf(testDevice1), viewModel.devices.value)
     }
 
 
     @Test
     fun `onDeviceFound updates existing device`() {
         val viewModel = ScanViewModel(TestBleScanner())
-
-        val ogDevice = BleDevice(
-            name = "Test Device",
-            address = "AA:BB:CC:DD:EE:FF",
-            rssi = -50,
-            services = emptyList()
-        )
-
-        val upDevice = BleDevice(
-            name = "Test Device",
-            address = "AA:BB:CC:DD:EE:FF",
-            rssi = -70,
-            services = emptyList()
-        )
+        val ogDevice = testDevice1
+        val updatedDevice = testDevice1.copy(rssi = -70)
         viewModel.onDeviceFound(ogDevice)
-        viewModel.onDeviceFound(upDevice)
+        viewModel.onDeviceFound(updatedDevice)
 
-        assertEquals(listOf(upDevice), viewModel.devices.value)
+        assertEquals(listOf(updatedDevice), viewModel.devices.value)
     }
 
 
@@ -60,18 +42,12 @@ class ScanViewModelTests {
             scanner = scanner,
             dispatcher = StandardTestDispatcher(testScheduler)
         )
-        val device = BleDevice(
-            name = "Test Device",
-            address = "AA:BB:CC:DD:EE:FF",
-            rssi = -50,
-            services = emptyList()
-        )
 
         viewModel.startScanning()
         advanceUntilIdle()
-        scanner.devices.emit(device)
+        scanner.devices.emit(testDevice1)
 
-        assertEquals(listOf(device), viewModel.devices.value)
+        assertEquals(listOf(testDevice1), viewModel.devices.value)
     }
 
     @Test
@@ -81,31 +57,19 @@ class ScanViewModelTests {
             scanner = scanner,
             dispatcher = StandardTestDispatcher(testScheduler)
         )
-        val device = BleDevice(
-            name = "Test Device",
-            address = "AA:BB:CC:DD:EE:FF",
-            rssi = -50,
-            services = emptyList()
-        )
-        val stoppedDevice = BleDevice(
-            name = "stopped Device",
-            address = "AA:BB:CC:DD:EE:FF",
-            rssi = -60,
-            services = emptyList()
-        )
 
         viewModel.startScanning()
         advanceUntilIdle()
-        scanner.devices.emit(device)
+        scanner.devices.emit(testDevice1)
 
-        assertEquals(listOf(device), viewModel.devices.value)
+        assertEquals(listOf(testDevice1), viewModel.devices.value)
 
         //stop scanning
         viewModel.stopScanning()
         advanceUntilIdle()
-        scanner.devices.emit(stoppedDevice)
+        scanner.devices.emit(testDevice2)
 
-        assertEquals(listOf(device), viewModel.devices.value)
+        assertEquals(listOf(testDevice1), viewModel.devices.value)
 
     }
 
@@ -121,3 +85,24 @@ private class TestBleScanner : BleScanner {
         return bluetoothEnabled
     }
 }
+
+    private val testDevice1 = BleDevice(
+        name = "Test Device",
+        address = "AA:BB:CC:DD:EE:FF",
+        rssi = -50,
+        services = emptyList(),
+        manufacturerData = emptyMap(),
+        isConnectable = true
+
+    )
+
+    private val testDevice2 = BleDevice(
+        name = "Test Device2",
+        address = "GG:HH:II:JJ:KK:LL",
+        rssi = -60,
+        services = emptyList(),
+        manufacturerData = emptyMap(),
+        isConnectable = true
+    )
+
+

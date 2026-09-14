@@ -1,6 +1,5 @@
 package com.example.bleex.ui
 
-import androidx.compose.material3.Text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,22 +105,34 @@ fun ScanScreenPreview() {
             name = "Pixel Buds",
             address = "AA:BB:CC:01",
             rssi = -42,
-            //estimatedDistance = null,
-            services = listOf("Battery Service")
+            services = listOf("Battery Service"),
+            manufacturerData = emptyMap(),
+            isConnectable = true
+
         ),
         BleDevice(
             name = "Samsung TV",
             address = "AA:BB:CC:02",
             rssi = -67,
             //estimatedDistance = null,
-            services = listOf("Device Information")
+            services = listOf("Device Information"),
+            manufacturerData = emptyMap(),
+            isConnectable = true
         ),
         BleDevice(
             name = "Garmin Watch",
             address = "AA:BB:CC:03",
             rssi = -55,
-            //estimatedDistance = null,
-            services = listOf("Battery Service", "Heart Rate")
+            services = listOf("Battery Service", "Heart Rate"),
+            manufacturerData = mapOf(
+                0x004C to byteArrayOf(
+                    0x02,
+                    0x15,
+                    0x7A,
+                    0x3B
+                )
+            ),isConnectable = true,
+
         )
     )
     var isScanning by remember { mutableStateOf(true) }

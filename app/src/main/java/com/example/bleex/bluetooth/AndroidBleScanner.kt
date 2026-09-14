@@ -44,14 +44,18 @@ class AndroidBleScanner(
                 result: ScanResult
             ) {
                 val name = result.device.name ?: "Unknown device" //incase the device name is null
-
+                val manufacturerData = result.scanRecord?.manufacturerSpecificData
                 val device = BleDevice(
                     name = name,
                     address = result.device.address,
                     rssi = result.rssi,
-                    //estimatedDistance = null,
-                    services = emptyList()
+                    services = emptyList(),
+                    manufacturerData = manufacturerData?.let{sparseArray -> (0 until sparseArray.size()).associate { index ->
+                        sparseArray.keyAt(index) to sparseArray.valueAt(index)
+                    }} ?: emptyMap(),
+                    isConnectable = result.isConnectable
                 )
+
                 //send device to flow
                 trySend(device)
                 Log.d(
