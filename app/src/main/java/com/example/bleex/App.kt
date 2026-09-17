@@ -20,14 +20,18 @@ import com.example.bleex.ui.StartScreen
 import android.os.Build
 
 
+enum class AppScreen{
+    START,
+    SCAN
+}
 @Composable
 fun App() {
 
-    var showScanScreen by remember { mutableStateOf(false) } //better way to do?
+    var currentScreen by remember { mutableStateOf(AppScreen.START) } //switch to using Navigation Compose?
 
     val context = LocalContext.current
 
-    //create a scanner for scanning bluetooth devices
+    //create a scanner
     val scanner = remember {
         AndroidBleScanner(context)
     }
@@ -56,42 +60,38 @@ fun App() {
     }
 
 
-        // permission checks
+        // permission request
         val permissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestMultiplePermissions()
         )  { permissions ->
             if (context.hasBlePermissions()) {
                 scanViewModel.startScanning()
-                showScanScreen = true
+                currentScreen = AppScreen.SCAN
             }
         }
 
-    //switch to scanning screen
-    if (showScanScreen) {
-        ScanScreen(
-            devices = devices,
-            isScanning = isScanning,
-            error= error,
-            onStartScan = {
-                scanViewModel.startScanning()
-            },
-            onStopScan = { scanViewModel.stopScanning() }
-        )
-
-        //starting screen
-    } else {
-        StartScreen(
+    //screen selection
+    when (currentScreen){
+        AppScreen.START-> StartScreen(
             onStartClick = {
                 if (context.hasBlePermissions()) {
                     scanViewModel.startScanning()
-                    showScanScreen = true
+                    currentScreen = AppScreen.SCAN
                 } else {
                     permissionLauncher.launch(permissions)
                 }
             }
         )
-    }
+
+     AppScreen.SCAN -> ScanScreen(
+        devices = devices,
+        isScanning = isScanning,
+        error = error,
+        onStartScan = { scanViewModel.startScanning() },
+        onStopScan = { scanViewModel.stopScanning() }
+    )
+}
 }
 
 
