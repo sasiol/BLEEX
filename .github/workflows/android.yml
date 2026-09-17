@@ -8,6 +8,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      security-events: write
+
     steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -32,14 +36,22 @@ jobs:
               path: app/build/test-results/testDebugUnitTest/*.xml
               reporter: java-junit
 
-        - name: SECURITY:Run Android lint
-          run: ./gradlew lint
+        - name: Run Android lint
+          run: ./gradlew lint --console=plain
 
-        - name: SECURITY:Run Trivy scan
+        - name: Run Trivy scan
           uses: aquasecurity/trivy-action@v0.36.0
           with:
               scan-type: 'fs'
               scan-ref: '.'
+              format: 'sarif'
+              output: 'trivy-results.sarif'
               severity: 'HIGH,CRITICAL'
               exit-code: '1'
               ignore-unfixed: true
+
+        - name: Upload Trivy results
+          if: always()
+          uses: github/codeql-action/upload-sarif@v4
+          with:
+            sarif_file: 'trivy-results.sarif'
