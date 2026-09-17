@@ -17,6 +17,7 @@ import com.example.bleex.bluetooth.hasBlePermissions
 import com.example.bleex.ui.ScanScreen
 import com.example.bleex.viewmodel.ScanViewModel
 import com.example.bleex.ui.StartScreen
+import android.os.Build
 
 
 @Composable
@@ -39,6 +40,20 @@ fun App() {
     //track scanning state
     val isScanning by scanViewModel.isScanning.collectAsState()
     val error by scanViewModel.error.collectAsState()
+
+    //permissions required
+    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        //android 12+
+        arrayOf(
+            Manifest.permission.BLUETOOTH_SCAN,
+            Manifest.permission.BLUETOOTH_CONNECT
+        )
+    } else{
+        //android 11 and lower
+        arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    }
 
 
         // permission checks
@@ -72,13 +87,7 @@ fun App() {
                     scanViewModel.startScanning()
                     showScanScreen = true
                 } else {
-                    permissionLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.BLUETOOTH_SCAN,
-                            Manifest.permission.BLUETOOTH_CONNECT,
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        )
-                    )
+                    permissionLauncher.launch(permissions)
                 }
             }
         )
