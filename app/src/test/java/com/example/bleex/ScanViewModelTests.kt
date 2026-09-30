@@ -111,12 +111,35 @@ class ScanViewModelTests {
         assertEquals(1, scanner.scanCount)
     }
 
+    @Test
+    fun `bluetooth turning off stops scanning`() = runTest {
+        val scanner = TestBleScanner()
+
+        val viewModel = ScanViewModel(
+            scanner = scanner,
+            dispatcher = StandardTestDispatcher(testScheduler)
+        )
+
+        viewModel.startScanning()
+        advanceUntilIdle()
+
+        assertEquals(true, viewModel.isScanning.value)
+
+        scanner.bluetoothStates.emit(false)
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.isScanning.value)
+        assertEquals("Bluetooth is turned off", viewModel.error.value)
+    }
+
 
 
 }
 
 private class TestBleScanner : BleScanner {
     val devices = MutableSharedFlow<BleDevice>()
+    val bluetoothStates = MutableSharedFlow<Boolean>()
+
     var bluetoothEnabled = true
     var scanCount=0
     override fun scan(): Flow<BleDevice> {
@@ -126,7 +149,12 @@ private class TestBleScanner : BleScanner {
     override fun isBluetoothEnabled(): Boolean {
         return bluetoothEnabled
     }
+    override fun bluetoothState(): Flow<Boolean> = bluetoothStates
+
 }
+
+
+
 
     private val testDevice1 = BleDevice(
         name = "Test Device",
