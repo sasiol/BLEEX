@@ -1,5 +1,6 @@
 package com.example.bleex.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -20,6 +21,7 @@ fun BleexButton(
         onClick = onClick,
         modifier = modifier.size(160.dp),
         shape = CircleShape,
+        contentPadding = PaddingValues(0.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = Color(0xFF0D2A4A)
         )

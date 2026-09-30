@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun BleexTopBar(
-    rightContent: @Composable (() -> Unit)? = null
+    leftContent: @Composable (() -> Unit)? = null
 ) {
     Box(
         modifier = Modifier
@@ -37,6 +37,14 @@ fun BleexTopBar(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center)
         )
+        leftContent?.let {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+            ) {
+                it()
+            }
+        }
 
     }
 }

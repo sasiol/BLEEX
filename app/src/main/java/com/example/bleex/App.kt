@@ -89,7 +89,11 @@ fun App() {
         isScanning = isScanning,
         error = error,
         onStartScan = { scanViewModel.startScanning() },
-        onStopScan = { scanViewModel.stopScanning() }
+        onStopScan = { scanViewModel.stopScanning() },
+         onBack = {
+             scanViewModel.stopScanning()
+             currentScreen = AppScreen.START
+         }
     )
 }
 }

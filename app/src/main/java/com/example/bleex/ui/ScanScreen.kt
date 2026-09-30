@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -15,6 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.bleex.bluetooth.BleDevice
@@ -29,70 +35,96 @@ fun ScanScreen(devices: List<BleDevice>,
                isScanning: Boolean,
                error:String?,
                onStartScan: () -> Unit,
-               onStopScan:() -> Unit ) {
+               onStopScan:() -> Unit,
+                onBack: () -> Unit)
+{
 
     var expandedDevice by remember { mutableStateOf<String?>(null) }
 
 
     Box(
         modifier = Modifier.fillMaxSize()
+    )
+    Column(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            if (error != null) {
-                Text(text = error,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
 
         // Top bar
-            BleexTopBar()
-
-        // Device list
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(
-                top = 20.dp,
-                bottom = 40.dp
-            )
-        ) {
-            items(devices) { device ->
-                val isExpanded = expandedDevice == device.address
-
-                BleDeviceCard(
-                    device = device,
-                    expanded = isExpanded,
-                    onClick = {
-                        expandedDevice =
-                            if (isExpanded) {
-                                null
-                            } else {
-                                device.address
-                            }
-                    }
-                )
-            }
-        }
-            }
-        if (isScanning){
-            ScanBorder()
-        }
-        BleexButton(
-            text = if (isScanning) "STOP SCAN" else "START SCAN",
-            onClick = {
-                if (isScanning) {
-                    onStopScan()
-                } else {
-                    onStartScan()
+        BleexTopBar(
+            leftContent = {
+                IconButton(
+                    onClick = onBack
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White
+                    )
                 }
-            },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp)
+            }
         )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            // erroor message place
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                if (error != null) {
+                    Text(
+                        text = error!!,
+                        color = Color.Red
+                    )
+                }
+
+                // Device list
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = 20.dp,
+                        bottom = 40.dp
+                    )
+                ) {
+                    items(devices) { device ->
+                        val isExpanded = expandedDevice == device.address
+
+                        BleDeviceCard(
+                            device = device,
+                            expanded = isExpanded,
+                            onClick = {
+                                expandedDevice =
+                                    if (isExpanded) {
+                                        null
+                                    } else {
+                                        device.address
+                                    }
+                            }
+                        )
+                    }
+                }
+            }
+            if (isScanning) {
+                ScanBorder()
+            }
+            BleexButton(
+                text = if (isScanning) "STOP SCAN" else "START SCAN",
+                onClick = {
+                    if (isScanning) {
+                        onStopScan()
+                    } else {
+                        onStartScan()
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp)
+            )
+        }
     }
-}
+    }
+
 
 
 
@@ -136,6 +168,6 @@ fun ScanScreenPreview() {
         )
     )
     var isScanning by remember { mutableStateOf(true) }
-    ScanScreen(devices = fakeDevices, isScanning = isScanning, error=null, onStartScan = {isScanning = true}, onStopScan= {isScanning = false})
+    ScanScreen(devices = fakeDevices, isScanning = isScanning, error=null, onStartScan = {isScanning = true}, onStopScan= {isScanning = false}, onBack = {} )
 }
 
