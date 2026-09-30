@@ -20,6 +20,10 @@ class ScanViewModel (
     private val scanner: BleScanner,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Main
 ): ViewModel(){
+    //observer if bluetooth is on or not
+    init {
+        observeBluetoothState()
+    }
 
     //has private and public  list of devices using flow
     private val _devices = MutableStateFlow<List<BleDevice>>(emptyList())
@@ -30,6 +34,8 @@ class ScanViewModel (
     private val _isScanning = MutableStateFlow(false)
     val isScanning: StateFlow<Boolean> = _isScanning.asStateFlow()
 
+    //keep track of bluetooth state
+    private var bluetoothStateJob: Job? = null
     //error handling
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
@@ -96,6 +102,20 @@ class ScanViewModel (
                 if (i==index) {
                 device} else {
                     existingDevice
+                }
+            }
+        }
+    }
+
+    private fun observeBluetoothState() {
+        bluetoothStateJob = viewModelScope.launch(dispatcher) {
+            scanner.bluetoothState().collect { enabled ->
+
+                if (!enabled) {
+                    stopScanning()
+                    _error.value = "Bluetooth is turned off"
+                } else {
+                    _error.value = null
                 }
             }
         }

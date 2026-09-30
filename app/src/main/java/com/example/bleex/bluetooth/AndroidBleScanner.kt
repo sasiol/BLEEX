@@ -1,15 +1,20 @@
 package com.example.bleex.bluetooth
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanResult
 import android.content.Context
+import android.content.IntentFilter
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import android.content.BroadcastReceiver
+import android.content.Intent
+
 
 /**
  * Handles BLE device scanning.
@@ -81,6 +86,31 @@ class AndroidBleScanner(
     }
     override fun isBluetoothEnabled(): Boolean {
         return bluetoothAdapter.isEnabled
+    }
+
+    override fun bluetoothState(): Flow<Boolean> = callbackFlow {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == BluetoothAdapter.ACTION_STATE_CHANGED) {
+                    val state = intent.getIntExtra(
+                        BluetoothAdapter.EXTRA_STATE,
+                        BluetoothAdapter.ERROR
+                    )
+
+                    trySend(state == BluetoothAdapter.STATE_ON)
+                }
+            }
+        }
+
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+
+        context.registerReceiver(receiver, filter)
+
+        trySend(bluetoothAdapter.isEnabled)
+
+        awaitClose {
+            context.unregisterReceiver(receiver)
+        }
     }
 }
 
