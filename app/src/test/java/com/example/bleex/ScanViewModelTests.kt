@@ -15,8 +15,8 @@ import kotlinx.coroutines.test.runTest
 class ScanViewModelTests {
 
     @Test
-    fun `onDeviceFound adds new device`() {
-        val viewModel = ScanViewModel(TestBleScanner())
+    fun `onDeviceFound adds new device`() = runTest {
+        val viewModel = ScanViewModel(TestBleScanner(), dispatcher = StandardTestDispatcher(testScheduler))
 
         viewModel.onDeviceFound(testDevice1)
 
@@ -25,8 +25,8 @@ class ScanViewModelTests {
 
 
     @Test
-    fun `onDeviceFound updates existing device`() {
-        val viewModel = ScanViewModel(TestBleScanner())
+    fun `onDeviceFound updates existing device`() = runTest{
+        val viewModel = ScanViewModel(TestBleScanner(), dispatcher = StandardTestDispatcher(testScheduler))
         val ogDevice = testDevice1
         val updatedDevice = testDevice1.copy(rssi = -70)
         viewModel.onDeviceFound(ogDevice)
