@@ -17,12 +17,26 @@ The project was built as a learning project to explore Android development, BLE 
 
 ## Screenshots
 
-### Scanning Screen
-<img width="1080" height="2106" alt="BLEEX scanning screen" src="https://github.com/user-attachments/assets/1e99f554-bd40-4a65-979c-31d309636393" />
-
-### Opened device info
-<img width="1080" height="2106" alt="BLEEX opened device information" src="https://github.com/user-attachments/assets/f5442f88-e033-4bf8-8ff2-97cf0184ceb3" />
-
+<table>
+  <tr>
+    <td align="center">
+      <strong>Scanning Screen</strong><br>
+      <img
+        src="https://github.com/user-attachments/assets/1e99f554-bd40-4a65-979c-31d309636393"
+        alt="BLEEX scanning screen"
+        width="300"
+      />
+    </td>
+    <td align="center">
+      <strong>Opened Device Info</strong><br>
+      <img
+        src="https://github.com/user-attachments/assets/f5442f88-e033-4bf8-8ff2-97cf0184ceb3"
+        alt="BLEEX opened device information"
+        width="300"
+      />
+    </td>
+  </tr>
+</table>
 
 
 
